@@ -13,39 +13,45 @@
 #include <vector>
 
 
-using Raytracer::Color;
-using Raytracer::HittableList;
-using Raytracer::HitRecord;
-using Raytracer::Infinity;
-using Raytracer::Pos3;
-using Raytracer::Ray;
-using Raytracer::Renderer;
-using Raytracer::Vec3;
+using namespace Raytracer;
 
 namespace {
 
 static void WriteColor(std::ostream& stream, const Color& color, float samplesPerPixel)
 {
-	float r = std::clamp(color.x() / samplesPerPixel, 0.0f, 0.999f);
-	float g = std::clamp(color.y() / samplesPerPixel, 0.0f, 0.999f);
-	float b = std::clamp(color.z() / samplesPerPixel, 0.0f, 0.999f);
+	// sqrt because of gamma 2
+	float r = std::clamp(std::sqrt(color.x() / samplesPerPixel), 0.0f, 0.999f);
+	float g = std::clamp(std::sqrt(color.y() / samplesPerPixel), 0.0f, 0.999f);
+	float b = std::clamp(std::sqrt(color.z() / samplesPerPixel), 0.0f, 0.999f);
 
 	stream << static_cast<int>(256 * r) << ' '
 		   << static_cast<int>(256 * g) << ' '
 		   << static_cast<int>(256 * b) << '\n';
 }
 
-static Color RayColor(const Ray& ray, const HittableList& world)
+static Color RayColor(const Ray& ray, const HittableList& world, uint32_t depth)
 {
-	HitRecord record;
-	if (world.Hit(ray, 0.0f, Infinity, record))
-	{
-		return 0.5f * (record.normal + Color{ 1, 1, 1 });
-	}
+	Ray currentRay = ray;
+	float attenuation = 1.0f;
 
-	Vec3 uDir = ray.Dir().normalized();
-	float t = 0.5f * (uDir.y() + 1.0f);
-	return (1.0f - t) * Color{ 1.0f, 1.0f, 1.0f } + t * Color{0.5f, 0.7f, 1.0f};
+	for (size_t i = 0; i < depth; i++)
+	{
+		HitRecord record;
+		if (world.Hit(currentRay, 0.001f, Infinity, record))
+		{
+			Pos3 target = record.pos + record.normal + RandomInHemisphereVec3(record.normal);
+			attenuation *= 0.5f;
+			currentRay = { record.pos, target - record.pos };
+		}
+		else
+		{
+			Vec3 uDir = currentRay.Dir().normalized();
+			float t = 0.5f * (uDir.y() + 1.0f);
+			Color c = (1.0f - t) * Color{ 1.0f, 1.0f, 1.0f } + t * Color{ 0.5f, 0.7f, 1.0f };
+			return attenuation * c;
+		}
+	}
+	return { 0.0f, 0.0f, 0.0f };
 }
 
 }  // namespace
@@ -53,7 +59,8 @@ static Color RayColor(const Ray& ray, const HittableList& world)
 
 void Renderer::OutputImage(std::string_view fileName) const
 {
-	constexpr uint32_t samplesPerPixel = 100;
+	constexpr uint32_t maxDepth = 8;
+	constexpr uint32_t samplesPerPixel = 32;
 
 	HittableList world;
 	world.Add({
@@ -85,7 +92,7 @@ void Renderer::OutputImage(std::string_view fileName) const
 				float u = (static_cast<float>(i) + RandomFloat()) / (fWidth - 1.0f);
 				float v = (static_cast<float>(j) + RandomFloat()) / (fHeight - 1.0f);
 
-				color += RayColor(camera.GetRay(u, v), world);
+				color += RayColor(camera.GetRay(u, v), world, maxDepth);
 				s++;
 			}
 

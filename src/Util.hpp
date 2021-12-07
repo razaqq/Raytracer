@@ -29,5 +29,29 @@ inline float RandomFloat(float min = 0.0f, float max = 1.0f)
 	return std::uniform_real_distribution(min, max)(g_pcg);
 }
 
-}  // namespace Raytracer
+// RandomVec3, RandomUnitVec3 and RandomInHemisphereVec3
+// can be used as different diffuse renderers
+inline Vec3 RandomVec3(float maxLength = 1.0f)
+{
+	while (true)
+	{
+		Vec3 v = Vec3::Random();
+		float length = v.squaredNorm();
+		if (length >= maxLength) continue;
+		return v;
+	}
+}
 
+inline Vec3 RandomUnitVec3()
+{
+	return RandomVec3().normalized();
+}
+
+inline Vec3 RandomInHemisphereVec3(const Vec3& normal)
+{
+	Vec3 r = RandomVec3();
+	// same hemisphere as normal
+	return r.dot(normal) > 0.0f ? r : -r;
+}
+
+}  // namespace Raytracer
