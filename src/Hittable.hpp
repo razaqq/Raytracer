@@ -1,6 +1,8 @@
 // Copyright 2021 <github.com/razaqq>
 #pragma once
 
+#include "HitRecord.hpp"
+#include "Material.hpp"
 #include "Ray.hpp"
 #include "Util.hpp"
 
@@ -10,31 +12,19 @@
 
 namespace Raytracer {
 
-struct HitRecord
-{
-	Pos3 pos;
-	Vec3 normal;
-	float t;
-	bool frontFacing;
-
-	void SetFaceNormal(const Ray& ray, const Vec3& outwardNormal)
-	{
-		frontFacing = ray.Dir().dot(outwardNormal) < 0.0f;
-		normal = frontFacing ? outwardNormal : -outwardNormal;
-	}
-};
-
 class Sphere
 {
 public:
 	Sphere() = delete;
-	Sphere(Pos3 center, float radius) : m_center(std::move(center)), m_radius(radius) {}
+	Sphere(Pos3 center, float radius, Material material)
+		: m_center(std::move(center)), m_radius(radius), m_material(std::move(material)) {}
 
 	bool Hit(const Ray& ray, float tMin, float tMax, HitRecord& record) const;
 
 private:
 	Pos3 m_center;
 	float m_radius;
+	Material m_material;
 };
 
 #define ADD_SHAPE(Type, Member)                                                                \

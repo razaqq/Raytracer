@@ -66,7 +66,7 @@ public:
 
 void Log::Init()
 {
-	std::string filePath = "PotatoAlert.log";
+	std::string filePath = "Raytracer.log";
 
 	spdlog::set_error_handler([](const std::string& msg)
 							  { spdlog::get("console")->error("*** LOGGER ERROR ***: {}", msg); });

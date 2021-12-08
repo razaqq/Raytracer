@@ -48,8 +48,9 @@ bool Sphere::Hit(const Ray& ray, float tMin, float tMax, HitRecord& record) cons
 	}
 
 	record.t = root;
-	record.pos = ray(root);
+	record.pos = ray.At(root);
 	record.SetFaceNormal(ray, (record.pos - m_center) / m_radius);
+	record.material = &const_cast<Material&>(m_material);
 
 	return true;
 }
@@ -66,8 +67,8 @@ bool HittableList::Hit(const Ray& ray, float tMin, float tMax, HitRecord& record
 		if (hittable.Hit(ray, tMin, closest, tempRecord)) \
 		{                                                 \
 			hit = true;                                   \
-			closest = record.t;                           \
 			record = tempRecord;                          \
+			closest = record.t;                           \
 		}                                                 \
 	}
 
@@ -75,4 +76,3 @@ bool HittableList::Hit(const Ray& ray, float tMin, float tMax, HitRecord& record
 
 	return hit;
 }
-

@@ -19,7 +19,7 @@ namespace {
 
 static void WriteColor(std::ostream& stream, const Color& color, float samplesPerPixel)
 {
-	// sqrt because of gamma 2
+	// sqrt for of gamma 2
 	float r = std::clamp(std::sqrt(color.x() / samplesPerPixel), 0.0f, 0.999f);
 	float g = std::clamp(std::sqrt(color.y() / samplesPerPixel), 0.0f, 0.999f);
 	float b = std::clamp(std::sqrt(color.z() / samplesPerPixel), 0.0f, 0.999f);
@@ -32,23 +32,32 @@ static void WriteColor(std::ostream& stream, const Color& color, float samplesPe
 static Color RayColor(const Ray& ray, const HittableList& world, uint32_t depth)
 {
 	Ray currentRay = ray;
-	float attenuation = 1.0f;
+	Color currentAttenuation = {1.0f, 1.0f, 1.0f};
 
 	for (size_t i = 0; i < depth; i++)
 	{
 		HitRecord record;
 		if (world.Hit(currentRay, 0.001f, Infinity, record))
 		{
-			Pos3 target = record.pos + record.normal + RandomInHemisphereVec3(record.normal);
-			attenuation *= 0.5f;
-			currentRay = { record.pos, target - record.pos };
+			Ray scattered;
+			Vec3 attenuation;
+			assert(record.material);
+			if (Scatter(currentRay, record, attenuation, scattered))
+			{
+				currentAttenuation = currentAttenuation.array() * attenuation.array();
+				currentRay = scattered;
+			}
+			else
+			{
+				return { 0.0f, 0.0f, 0.0f };
+			}
 		}
 		else
 		{
 			Vec3 uDir = currentRay.Dir().normalized();
 			float t = 0.5f * (uDir.y() + 1.0f);
 			Color c = (1.0f - t) * Color{ 1.0f, 1.0f, 1.0f } + t * Color{ 0.5f, 0.7f, 1.0f };
-			return attenuation * c;
+			return currentAttenuation.array() * c.array();
 		}
 	}
 	return { 0.0f, 0.0f, 0.0f };
@@ -64,8 +73,10 @@ void Renderer::OutputImage(std::string_view fileName) const
 
 	HittableList world;
 	world.Add({
-		{ Sphere({ 0.0f, 0.0f, -1.0f }, 0.5f) },
-		{ Sphere({ 0.0f, -100.5f, -1.0f }, 100.0f) }
+		{ Sphere({ 0.0f, -100.5f, -1.0f }, 100.0f, { MaterialType::Lambertian, { 0.8f, 0.8f, 0.0f } }) },
+		{ Sphere({ 0.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Lambertian, { 0.7f, 0.3f, 0.3f } }) },
+		{ Sphere({ -1.0f, 0.0f, -1.0f },   0.5f,   { MaterialType::Metal,      { 0.8f, 0.8f, 0.8f }, 0.3f }) },
+		{ Sphere({ 1.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Metal,      { 0.8f, 0.6f, 0.2f }, 1.0f }) }
 	});
 
 	auto fWidth = static_cast<float>(m_width);
@@ -86,17 +97,15 @@ void Renderer::OutputImage(std::string_view fileName) const
 		{
 			Color color{ 0.0f, 0.0f, 0.0f };
 
-			size_t s = 0;
-			while (s < samplesPerPixel)
+			for (int s = 0; s < samplesPerPixel; s++)
 			{
 				float u = (static_cast<float>(i) + RandomFloat()) / (fWidth - 1.0f);
 				float v = (static_cast<float>(j) + RandomFloat()) / (fHeight - 1.0f);
 
 				color += RayColor(camera.GetRay(u, v), world, maxDepth);
-				s++;
 			}
 
-			WriteColor(stream, color, samplesPerPixel);
+           WriteColor(stream, color, samplesPerPixel);
 		}
 	}
 

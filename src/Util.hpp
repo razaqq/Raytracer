@@ -2,6 +2,7 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 #include <numbers>
 #include <random>
@@ -20,6 +21,11 @@ static constexpr float Pi = std::numbers::pi_v<float>;
 inline float DegToRad(float deg)
 {
 	return deg * Pi / 180.0f;
+}
+
+inline Vec3 Reflect(const Vec3& v, const Vec3& n)
+{
+	return v - 2.0f * v.dot(n) * n;
 }
 
 static std::mt19937 g_pcg;
