@@ -55,4 +55,14 @@ inline Vec3 RandomInHemisphereVec3(const Vec3& normal)
 	return r.dot(normal) > 0.0f ? r : -r;
 }
 
+inline Vec3 RandomInUnitDiskVec3()
+{
+	while(true)
+	{
+		Vec3 p = { RandomFloat(-1.0f, 1.0f), RandomFloat(-1.0f, 1.0f), 0.0f };
+		if (p.squaredNorm() >= 1.0f) continue;
+		return p;
+	}
+}
+
 }  // namespace Raytracer

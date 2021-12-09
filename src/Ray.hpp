@@ -15,7 +15,7 @@ public:
 	[[nodiscard]] Pos3 Origin() const { return m_origin; }
 	[[nodiscard]] Vec3 Dir() const { return m_dir; }
 
-	Pos3 At(float t) const
+	[[nodiscard]] Pos3 At(float t) const
 	{
 		return m_origin + t * m_dir;  // P(t) = A * t * b
 	}

@@ -72,6 +72,12 @@ void Renderer::OutputImage(std::string_view fileName) const
 	constexpr uint32_t maxDepth = 8;
 	constexpr uint32_t samplesPerPixel = 32;
 
+	Vec3 cameraPos{ 3.0f, 3.0f, 2.0f };
+	Vec3 cameraLookAt{ 0.0f, 0.0f, -1.0f };
+	Vec3 vUp{ 0.0f, 1.0f, 0.0f };
+	constexpr float aperture = 2.0f;
+	float focusDist = (cameraPos - cameraLookAt).norm();
+
 	HittableList world;
 	world.Add({
 		{ Sphere({ 0.0f, -100.5f, -1.0f }, 100.0f, { MaterialType::Lambertian, { 0.8f, 0.8f, 0.0f } }) },
@@ -87,7 +93,7 @@ void Renderer::OutputImage(std::string_view fileName) const
 	auto fHeight = static_cast<float>(m_height);
 
 	// Camera
-	Camera camera({ 1, 1, 1 }, { 0, 0, -1 }, { 0, 1, 0 } , 90, fWidth / fHeight);
+	Camera camera(cameraPos, cameraLookAt, vUp, 34.0f, fWidth / fHeight, aperture, focusDist);
 
 	// Create the image
 	std::ofstream stream;
