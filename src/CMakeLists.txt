@@ -2,6 +2,7 @@ set(
 	SRC
 	Hittable.cpp
 	Log.cpp
+	Material.cpp
 	Raytracer.cpp
 	Renderer.cpp
 )

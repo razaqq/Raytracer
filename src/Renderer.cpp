@@ -78,6 +78,7 @@ void Renderer::OutputImage(std::string_view fileName) const
 		{ Sphere({ 0.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Lambertian, { 0.1f, 0.2f, 0.5f } }) },
 		//{ Sphere({ 0.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Lambertian, { 0.7f, 0.3f, 0.3f } }) },
 		{ Sphere({ -1.0f, 0.0f, -1.0f },   0.5f,   { MaterialType::Dielectric,      { 0.8f, 0.8f, 0.8f }, 1.0f, 1.5f }) },
+		// { Sphere({ -1.0f, 0.0f, -1.0f },   -0.45f,   { MaterialType::Dielectric,      { 0.8f, 0.8f, 0.8f }, 1.0f, 1.5f }) },
 		//{ Sphere({ -1.0f, 0.0f, -1.0f },   0.5f,   { MaterialType::Metal,      { 0.8f, 0.8f, 0.8f }, 0.3f }) },
 		{ Sphere({ 1.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Metal,      { 0.8f, 0.6f, 0.2f }, 0.0f }) }
 	});
@@ -86,7 +87,7 @@ void Renderer::OutputImage(std::string_view fileName) const
 	auto fHeight = static_cast<float>(m_height);
 
 	// Camera
-	Camera camera(fWidth, fHeight);
+	Camera camera({ 1, 1, 1 }, { 0, 0, -1 }, { 0, 1, 0 } , 90, fWidth / fHeight);
 
 	// Create the image
 	std::ofstream stream;
