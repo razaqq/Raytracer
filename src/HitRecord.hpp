@@ -13,9 +13,9 @@ struct HitRecord
 {
 	Pos3 pos;
 	Vec3 normal;
-	float t;
+	float t = Infinity;
 	bool frontFacing;
-	Material* material;
+	Material* material = nullptr;
 
 	void SetFaceNormal(const Ray& ray, const Vec3& outwardNormal)
 	{

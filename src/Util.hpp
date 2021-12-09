@@ -23,11 +23,6 @@ inline float DegToRad(float deg)
 	return deg * Pi / 180.0f;
 }
 
-inline Vec3 Reflect(const Vec3& v, const Vec3& n)
-{
-	return v - 2.0f * v.dot(n) * n;
-}
-
 static std::mt19937 g_pcg;
 
 inline float RandomFloat(float min = 0.0f, float max = 1.0f)

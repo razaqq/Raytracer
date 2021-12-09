@@ -6,6 +6,7 @@
 #include "Camera.hpp"
 #include "Hittable.hpp"
 #include "Log.hpp"
+#include "Material.hpp"
 #include "Ray.hpp"
 
 #include <algorithm>
@@ -74,9 +75,11 @@ void Renderer::OutputImage(std::string_view fileName) const
 	HittableList world;
 	world.Add({
 		{ Sphere({ 0.0f, -100.5f, -1.0f }, 100.0f, { MaterialType::Lambertian, { 0.8f, 0.8f, 0.0f } }) },
-		{ Sphere({ 0.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Lambertian, { 0.7f, 0.3f, 0.3f } }) },
-		{ Sphere({ -1.0f, 0.0f, -1.0f },   0.5f,   { MaterialType::Metal,      { 0.8f, 0.8f, 0.8f }, 0.3f }) },
-		{ Sphere({ 1.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Metal,      { 0.8f, 0.6f, 0.2f }, 1.0f }) }
+		{ Sphere({ 0.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Lambertian, { 0.1f, 0.2f, 0.5f } }) },
+		//{ Sphere({ 0.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Lambertian, { 0.7f, 0.3f, 0.3f } }) },
+		{ Sphere({ -1.0f, 0.0f, -1.0f },   0.5f,   { MaterialType::Dielectric,      { 0.8f, 0.8f, 0.8f }, 1.0f, 1.5f }) },
+		//{ Sphere({ -1.0f, 0.0f, -1.0f },   0.5f,   { MaterialType::Metal,      { 0.8f, 0.8f, 0.8f }, 0.3f }) },
+		{ Sphere({ 1.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Metal,      { 0.8f, 0.6f, 0.2f }, 0.0f }) }
 	});
 
 	auto fWidth = static_cast<float>(m_width);
