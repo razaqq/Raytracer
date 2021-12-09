@@ -30,6 +30,11 @@ inline float RandomFloat(float min = 0.0f, float max = 1.0f)
 	return std::uniform_real_distribution(min, max)(g_pcg);
 }
 
+inline Color RandomColor(float min, float max)
+{
+	return { RandomFloat(min, max), RandomFloat(min, max), RandomFloat(min, max) };
+}
+
 // RandomVec3, RandomUnitVec3 and RandomInHemisphereVec3
 // can be used as different diffuse renderers
 inline Vec3 RandomVec3(float maxLength = 1.0f)

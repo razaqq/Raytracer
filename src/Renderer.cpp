@@ -8,6 +8,7 @@
 #include "Log.hpp"
 #include "Material.hpp"
 #include "Ray.hpp"
+#include "SceneSerializer.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -69,15 +70,17 @@ static Color RayColor(const Ray& ray, const HittableList& world, uint32_t depth)
 
 void Renderer::OutputImage(std::string_view fileName) const
 {
-	constexpr uint32_t maxDepth = 8;
+	constexpr uint32_t maxDepth = 50;
 	constexpr uint32_t samplesPerPixel = 32;
 
-	Vec3 cameraPos{ 3.0f, 3.0f, 2.0f };
-	Vec3 cameraLookAt{ 0.0f, 0.0f, -1.0f };
+	Vec3 cameraPos{ 13.0f, 2.0f, 3.0f };
+	Vec3 cameraLookAt{ 0.0f, 0.0f, 0.0f };
 	Vec3 vUp{ 0.0f, 1.0f, 0.0f };
-	constexpr float aperture = 2.0f;
-	float focusDist = (cameraPos - cameraLookAt).norm();
+	constexpr float aperture = 0.1f;
+	// float focusDist = (cameraPos - cameraLookAt).norm();
+	float focusDist = 10.0f;
 
+#if 0
 	HittableList world;
 	world.Add({
 		{ Sphere({ 0.0f, -100.5f, -1.0f }, 100.0f, { MaterialType::Lambertian, { 0.8f, 0.8f, 0.0f } }) },
@@ -88,6 +91,9 @@ void Renderer::OutputImage(std::string_view fileName) const
 		//{ Sphere({ -1.0f, 0.0f, -1.0f },   0.5f,   { MaterialType::Metal,      { 0.8f, 0.8f, 0.8f }, 0.3f }) },
 		{ Sphere({ 1.0f, 0.0f, -1.0f },    0.5f,   { MaterialType::Metal,      { 0.8f, 0.6f, 0.2f }, 0.0f }) }
 	});
+#endif
+
+	HittableList world = RandomScene();
 
 	auto fWidth = static_cast<float>(m_width);
 	auto fHeight = static_cast<float>(m_height);
